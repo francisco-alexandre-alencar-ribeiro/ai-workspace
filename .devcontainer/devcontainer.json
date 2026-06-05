@@ -1,0 +1,56 @@
+{
+  "name": "AI Workspace",
+
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "devcontainer",
+  "workspaceFolder": "/workspace",
+
+  "remoteUser": "vscode",
+
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "python.defaultInterpreterPath": "/usr/bin/python3",
+        "editor.formatOnSave": true,
+        "terminal.integrated.defaultProfile.linux": "bash"
+      },
+      "extensions": [
+        // Claude Code — autenticação via extensão, sem API key
+        "Anthropic.claude-code",
+        // Python
+        "ms-python.python",
+        "ms-python.black-formatter",
+        "ms-python.pylint",
+        "ms-python.vscode-pylance",
+        // JavaScript / TypeScript
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        // Git
+        "eamodio.gitlens",
+        "mhutchie.git-graph",
+        // Containers & env
+        "ms-azuretools.vscode-docker",
+        "mikestead.dotenv",
+        // Productivity
+        "streetsidesoftware.code-spell-checker",
+        "christian-kohler.path-intellisense",
+        "Continue.continue"
+      ]
+    }
+  },
+
+  // Ports to forward from the container to your local machine
+  "forwardPorts": [
+    3000,  // generic web app
+    8000,  // Python / FastAPI
+    8080,  // alternative HTTP
+    11434  // Ollama (local LLM)
+  ],
+
+  "portsAttributes": {
+    "3000": { "label": "Web App" },
+    "8000": { "label": "Python API" },
+    "8080": { "label": "HTTP Alt" },
+    "11434": { "label": "Ollama" }
+  }
+}

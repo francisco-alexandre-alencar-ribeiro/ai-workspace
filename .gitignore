@@ -1,0 +1,3 @@
+# Ignora todo o conteúdo de workspace/, mas mantém a pasta no repositório
+workspace/*
+!workspace/.gitkeep

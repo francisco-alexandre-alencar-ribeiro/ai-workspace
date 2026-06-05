@@ -1,0 +1,63 @@
+services:
+  devcontainer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ai-workspace-devcontainer
+
+    volumes:
+      # Project workspace
+      - ../workspace:/workspace:z
+      # Persist shell history and uv cache across rebuilds
+      - vscode:/home/vscode/
+      # Forward host SSH agent so git operations work without baking keys into the image
+      - type: bind
+        source: ${SSH_AUTH_SOCK:-/dev/null}
+        target: /ssh-agent
+        read_only: true
+
+    environment:
+      - SSH_AUTH_SOCK=/ssh-agent
+      - PYTHONDONTWRITEBYTECODE=1
+      - PYTHONUNBUFFERED=1
+
+    # Keep the container alive for VS Code to attach
+    command: sleep infinity
+
+    # ── Security hardening ────────────────────────────────────────────────────
+    user: vscode
+    read_only: false          # dev containers need write access; tighten per project
+    security_opt:
+      - no-new-privileges:true  # prevents privilege escalation via setuid binaries
+    cap_drop:
+      - ALL                    # drop every Linux capability...
+    cap_add:
+      - CHOWN                  # ...then add back only what's needed for dev work
+      - SETUID
+      - SETGID
+      - DAC_OVERRIDE
+
+    # ── Resource limits (adjust to your machine) ──────────────────────────────
+    deploy:
+      resources:
+        limits:
+          memory: 8g
+          cpus: "4"
+        reservations:
+          memory: 512m
+          cpus: "0.5"
+
+    # ── Networking ────────────────────────────────────────────────────────────
+    networks:
+      - shared-network
+
+# ── Named volumes ─────────────────────────────────────────────────────────────
+volumes:
+  vscode:
+    name: vscode
+
+# ── Networks ──────────────────────────────────────────────────────────────────
+networks:
+  shared-network:
+    external: true
+    name: shared-network
