@@ -42,7 +42,7 @@ Um Dev Container para VS Code pronto para uso em desenvolvimento de IA e softwar
 1. **Clone o repositório**
 
    ```bash
-   git clone <url-do-seu-repositorio>
+   git clone https://github.com/francisco-alexandre-alencar-ribeiro/ai-workspace.git
    cd ai-workspace
    ```
 
