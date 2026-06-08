@@ -54,6 +54,9 @@ COPY --from=ollama/ollama:latest /bin/ollama /usr/local/bin/ollama
 # Ensure workspace dir belongs to vscode user
 RUN mkdir -p /workspace && chown vscode:vscode /workspace
 
+# Create python -> python3 symlink for convenience (while still root)
+RUN ln -s /usr/bin/python3 /usr/bin/python
+
 # Drop to non-root for everything from here on
 USER vscode
 WORKDIR /workspace
