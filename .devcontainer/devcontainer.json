@@ -15,8 +15,6 @@
         "terminal.integrated.defaultProfile.linux": "bash"
       },
       "extensions": [
-        // Claude Code — autenticação via extensão, sem API key
-        "Anthropic.claude-code",
         // Python
         "ms-python.python",
         "ms-python.black-formatter",

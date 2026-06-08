@@ -1,9 +1,54 @@
 services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    volumes:
+      - ollama-models:/root/.ollama
+    ports:
+      - "${OLLAMA_PORT:-11434}:11434"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    networks:
+      - shared-network
+    # ── GPU support (NVIDIA) — uncomment if you have the NVIDIA Container Toolkit ─
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: open-webui
+    restart: unless-stopped
+    ports:
+      - "${WEBUI_PORT:-3000}:8080"
+    environment:
+      - OLLAMA_BASE_URL=${OLLAMA_BASE_URL:-http://ollama:11434}
+    volumes:
+      - open-webui-data:/app/backend/data
+    networks:
+      - shared-network
+    depends_on:
+      ollama:
+        condition: service_healthy
+
   devcontainer:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        NODE_MAJOR: ${NODE_MAJOR:-20}
     image: ai-workspace-devcontainer
+    depends_on:
+      - ollama
 
     volumes:
       # Project workspace
@@ -20,6 +65,7 @@ services:
       - SSH_AUTH_SOCK=/ssh-agent
       - PYTHONDONTWRITEBYTECODE=1
       - PYTHONUNBUFFERED=1
+      - OLLAMA_HOST=${OLLAMA_HOST:-http://ollama:11434}
 
     # Keep the container alive for VS Code to attach
     command: sleep infinity
@@ -41,11 +87,11 @@ services:
     deploy:
       resources:
         limits:
-          memory: 8g
-          cpus: "4"
+          memory: ${DEVCONTAINER_MEMORY_LIMIT:-8g}
+          cpus: "${DEVCONTAINER_CPU_LIMIT:-4}"
         reservations:
-          memory: 512m
-          cpus: "0.5"
+          memory: ${DEVCONTAINER_MEMORY_RESERVE:-512m}
+          cpus: "${DEVCONTAINER_CPU_RESERVE:-0.5}"
 
     # ── Networking ────────────────────────────────────────────────────────────
     networks:
@@ -55,6 +101,10 @@ services:
 volumes:
   vscode:
     name: vscode
+  ollama-models:
+    name: ollama-models
+  open-webui-data:
+    name: open-webui-data
 
 # ── Networks ──────────────────────────────────────────────────────────────────
 networks:
