@@ -1,27 +1,27 @@
 # AI Workspace — Dev Container
 
-Um Dev Container para VS Code pronto para uso em desenvolvimento de IA e software em geral. Oferece um ambiente consistente e reproduzível com Python, Node.js, .NET e um conjunto de ferramentas — incluindo Claude Code e Ollama — rodando em um stack Docker com hardening de segurança.
+Um Dev Container para VS Code pronto para uso em desenvolvimento de IA e software em geral. Oferece um ambiente consistente e reproduzível com Python, Node.js, .NET e um conjunto de ferramentas — incluindo Claude Code e o CLI do Ollama — rodando em Docker com hardening de segurança.
 
-## Serviços
+## Arquitetura
 
-O `docker-compose.yml` sobe três containers:
+O `docker-compose.yml` sobe **um container**:
 
 | Serviço | Imagem | Descrição |
 |---|---|---|
 | **devcontainer** | build local | Ambiente de desenvolvimento (VS Code se conecta aqui) |
-| **ollama** | `ollama/ollama:latest` | Servidor de LLMs locais |
-| **open-webui** | `ghcr.io/open-webui/open-webui:main` | Interface web para o Ollama (acesse em `localhost:3000`) |
+
+O devcontainer ingressa na rede externa `shared-network`, onde serviços como **Ollama** e **Open WebUI** são esperados. Esses serviços devem ser iniciados separadamente (por exemplo, em outro compose stack) e ficam acessíveis pelo hostname `ollama` na mesma rede.
 
 ## O que está incluído no devcontainer
 
 | Camada | Detalhes |
 |---|---|
 | **Imagem base** | `mcr.microsoft.com/devcontainers/base:ubuntu-24.04` |
-| **Python** | Python 3 (`python3`, `python3-dev`, `python3-venv`) + [`uv`](https://github.com/astral-sh/uv) |
+| **Python** | Python 3 (`python3`, `python3-dev`, `python3-pip`, `python3-venv`) + [`uv`](https://github.com/astral-sh/uv) |
 | **Node.js** | Node 20 LTS (via NodeSource) + npm atualizado |
 | **.NET** | .NET 10 SDK (via repositório oficial da Microsoft) |
 | **Claude Code** | `@anthropic-ai/claude-code` instalado globalmente via npm |
-| **Ollama CLI** | Binário `ollama` copiado da imagem oficial; aponta para o serviço `ollama` via `OLLAMA_HOST` |
+| **Ollama CLI** | Binário `ollama` copiado da imagem oficial; aponta para o serviço externo via `OLLAMA_HOST` |
 | **Ferramentas de build** | `build-essential`, `make`, `git`, `git-lfs`, `jq`, `curl`, `wget`, `unzip` |
 | **Usuário** | `vscode` (não-root) |
 
@@ -37,12 +37,13 @@ O `docker-compose.yml` sobe três containers:
 
 ### Portas encaminhadas
 
-| Porta | Serviço |
-|---|---|
-| `3000` | Open WebUI |
-| `8000` | Python / FastAPI |
-| `8080` | HTTP alternativo |
-| `11434` | Ollama |
+| Porta | Label | Uso típico |
+|---|---|---|
+| `3000` | Web App | Open WebUI ou outra aplicação web |
+| `8000` | Python API | Python / FastAPI |
+| `8080` | HTTP Alt | HTTP alternativo |
+
+> A porta `11434` (Ollama API) não é encaminhada pelo devcontainer porque o Ollama roda em container separado; acesse-o pelo hostname `ollama` dentro da rede Docker.
 
 ## Pré-requisitos
 
@@ -72,11 +73,9 @@ O `docker-compose.yml` sobe três containers:
    docker network create shared-network
    ```
 
-4. **Crie a pasta `workspace/`** (somente na primeira vez)
+4. **Inicie os serviços externos na `shared-network`** (Ollama, Open WebUI, etc.)
 
-   ```bash
-   mkdir workspace
-   ```
+   Suba qualquer compose stack que forneça esses serviços na rede `shared-network`. O devcontainer os encontrará automaticamente pelo hostname.
 
 5. **Abra no VS Code e reabra no container**
 
@@ -84,7 +83,7 @@ O `docker-compose.yml` sobe três containers:
    Ctrl+Shift+P → Dev Containers: Reopen in Container
    ```
 
-   O VS Code irá construir a imagem e iniciar os três containers automaticamente. A pasta `workspace/` do host é montada em `/workspace` dentro do container.
+   O VS Code irá construir a imagem e iniciar o container automaticamente. A pasta `workspace/` do host é montada em `/workspace` dentro do container.
 
 ## Encaminhamento do agente SSH
 
@@ -97,7 +96,7 @@ ssh-add ~/.ssh/id_ed25519   # ou a sua chave de preferência
 
 ## Suporte a GPU (NVIDIA)
 
-O serviço `ollama` já tem a configuração de GPU comentada no `docker-compose.yml`. Para ativá-la, basta descomentar o bloco `deploy.resources.reservations.devices` no serviço `ollama` e garantir que o [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html) esteja instalado no host.
+O suporte a GPU é configurado no compose stack do serviço **Ollama** (externo a este repositório). Para ativá-lo, adicione o bloco `deploy.resources.reservations.devices` no serviço `ollama` desse stack e garanta que o [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html) esteja instalado no host.
 
 ## Limites de recursos
 
@@ -121,8 +120,8 @@ Os limites do devcontainer são configuráveis via variáveis de ambiente no `.e
 | Volume | Conteúdo |
 |---|---|
 | `vscode` | Home do usuário `vscode` (histórico de shell, cache do `uv`) |
-| `ollama-models` | Modelos baixados pelo Ollama |
-| `open-webui-data` | Dados e configurações do Open WebUI |
+
+> Volumes dos serviços externos (modelos do Ollama, dados do Open WebUI) são gerenciados pelos seus respectivos compose stacks.
 
 ## Estrutura do projeto
 
@@ -131,9 +130,10 @@ Os limites do devcontainer são configuráveis via variáveis de ambiente no `.e
 ├── .devcontainer/
 │   ├── devcontainer.json   # Configuração do Dev Container para o VS Code
 │   ├── Dockerfile          # Definição da imagem do container
-│   ├── docker-compose.yml  # Compose com serviços, volumes, rede e limites de recursos
+│   ├── docker-compose.yml  # Compose com o serviço, volume, rede e limites de recursos
 │   └── .env.example        # Variáveis de ambiente (copie para .env)
-└── workspace/              # Seus arquivos de trabalho (montado no container)
+├── .envs-ps1/              # Scripts de ambiente para sessões PowerShell (conteúdo ignorado pelo git)
+└── workspace/              # Seus arquivos de trabalho (montado em /workspace no container; conteúdo ignorado pelo git)
 ```
 
 ## Personalização
