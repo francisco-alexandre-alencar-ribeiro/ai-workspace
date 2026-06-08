@@ -1,22 +1,34 @@
 # AI Workspace — Dev Container
 
-Um Dev Container para VS Code pronto para uso em desenvolvimento de IA e software em geral. Oferece um ambiente consistente e reproduzível com Python, Node.js e um conjunto de extensões VS Code — incluindo o Claude Code — rodando em um container Docker com hardening de segurança.
+Um Dev Container para VS Code pronto para uso em desenvolvimento de IA e software em geral. Oferece um ambiente consistente e reproduzível com Python, Node.js, .NET e um conjunto de ferramentas — incluindo Claude Code e Ollama — rodando em um stack Docker com hardening de segurança.
 
-## O que está incluído
+## Serviços
+
+O `docker-compose.yml` sobe três containers:
+
+| Serviço | Imagem | Descrição |
+|---|---|---|
+| **devcontainer** | build local | Ambiente de desenvolvimento (VS Code se conecta aqui) |
+| **ollama** | `ollama/ollama:latest` | Servidor de LLMs locais |
+| **open-webui** | `ghcr.io/open-webui/open-webui:main` | Interface web para o Ollama (acesse em `localhost:3000`) |
+
+## O que está incluído no devcontainer
 
 | Camada | Detalhes |
 |---|---|
 | **Imagem base** | `mcr.microsoft.com/devcontainers/base:ubuntu-24.04` |
-| **Python** | Python 3 + [`uv`](https://github.com/astral-sh/uv) (gerenciador de pacotes rápido) |
-| **Node.js** | Node 20 LTS (via NodeSource) |
-| **Ferramentas de build** | `build-essential`, `make`, `git`, `git-lfs`, `jq`, `curl`, `wget` |
+| **Python** | Python 3 (`python3`, `python3-dev`, `python3-venv`) + [`uv`](https://github.com/astral-sh/uv) |
+| **Node.js** | Node 20 LTS (via NodeSource) + npm atualizado |
+| **.NET** | .NET 10 SDK (via repositório oficial da Microsoft) |
+| **Claude Code** | `@anthropic-ai/claude-code` instalado globalmente via npm |
+| **Ollama CLI** | Binário `ollama` copiado da imagem oficial; aponta para o serviço `ollama` via `OLLAMA_HOST` |
+| **Ferramentas de build** | `build-essential`, `make`, `git`, `git-lfs`, `jq`, `curl`, `wget`, `unzip` |
 | **Usuário** | `vscode` (não-root) |
 
 ### Extensões VS Code
 
 | Categoria | Extensões |
 |---|---|
-| IA | Claude Code (`Anthropic.claude-code`), Continue (`Continue.continue`) |
 | Python | Python, Black formatter, Pylint, Pylance |
 | JS / TS | ESLint, Prettier |
 | Git | GitLens, Git Graph |
@@ -27,10 +39,10 @@ Um Dev Container para VS Code pronto para uso em desenvolvimento de IA e softwar
 
 | Porta | Serviço |
 |---|---|
-| `3000` | Aplicação web genérica |
+| `3000` | Open WebUI |
 | `8000` | Python / FastAPI |
 | `8080` | HTTP alternativo |
-| `11434` | [Ollama](https://ollama.com) (LLM local) |
+| `11434` | Ollama |
 
 ## Pré-requisitos
 
@@ -46,19 +58,33 @@ Um Dev Container para VS Code pronto para uso em desenvolvimento de IA e softwar
    cd ai-workspace
    ```
 
-2. **Crie a rede Docker compartilhada** (somente uma vez)
+2. **Configure as variáveis de ambiente**
+
+   ```bash
+   cp .devcontainer/.env.example .devcontainer/.env
+   ```
+
+   Edite `.devcontainer/.env` conforme necessário. Os valores padrão já funcionam para a maioria dos casos.
+
+3. **Crie a rede Docker compartilhada** (somente uma vez)
 
    ```bash
    docker network create shared-network
    ```
 
-3. **Abra no VS Code e reabra no container**
+4. **Crie a pasta `workspace/`** (somente na primeira vez)
+
+   ```bash
+   mkdir workspace
+   ```
+
+5. **Abra no VS Code e reabra no container**
 
    ```
    Ctrl+Shift+P → Dev Containers: Reopen in Container
    ```
 
-   O VS Code irá construir a imagem e iniciar o container automaticamente. A pasta `workspace/` do seu host é montada em `/workspace` dentro do container.
+   O VS Code irá construir a imagem e iniciar os três containers automaticamente. A pasta `workspace/` do host é montada em `/workspace` dentro do container.
 
 ## Encaminhamento do agente SSH
 
@@ -69,20 +95,34 @@ eval "$(ssh-agent -s)"
 ssh-add ~/.ssh/id_ed25519   # ou a sua chave de preferência
 ```
 
+## Suporte a GPU (NVIDIA)
+
+O serviço `ollama` já tem a configuração de GPU comentada no `docker-compose.yml`. Para ativá-la, basta descomentar o bloco `deploy.resources.reservations.devices` no serviço `ollama` e garantir que o [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html) esteja instalado no host.
+
 ## Limites de recursos
 
-Limites padrão definidos no `docker-compose.yml` (ajuste conforme a sua máquina):
+Os limites do devcontainer são configuráveis via variáveis de ambiente no `.env` (valores padrão entre parênteses):
 
-| Recurso | Limite | Reserva |
+| Variável | Padrão | Descrição |
 |---|---|---|
-| Memória | 8 GB | 512 MB |
-| CPU | 4 núcleos | 0,5 núcleos |
+| `DEVCONTAINER_MEMORY_LIMIT` | `8g` | Limite de memória |
+| `DEVCONTAINER_MEMORY_RESERVE` | `512m` | Reserva de memória |
+| `DEVCONTAINER_CPU_LIMIT` | `4` | Limite de CPUs |
+| `DEVCONTAINER_CPU_RESERVE` | `0.5` | Reserva de CPUs |
 
 ## Hardening de segurança
 
 - Executa como usuário não-root `vscode`
 - Flag `no-new-privileges` previne escalada de privilégios via binários setuid
 - Todas as capabilities Linux são removidas; somente `CHOWN`, `SETUID`, `SETGID` e `DAC_OVERRIDE` são adicionadas de volta
+
+## Volumes persistentes
+
+| Volume | Conteúdo |
+|---|---|
+| `vscode` | Home do usuário `vscode` (histórico de shell, cache do `uv`) |
+| `ollama-models` | Modelos baixados pelo Ollama |
+| `open-webui-data` | Dados e configurações do Open WebUI |
 
 ## Estrutura do projeto
 
@@ -91,16 +131,18 @@ Limites padrão definidos no `docker-compose.yml` (ajuste conforme a sua máquin
 ├── .devcontainer/
 │   ├── devcontainer.json   # Configuração do Dev Container para o VS Code
 │   ├── Dockerfile          # Definição da imagem do container
-│   └── docker-compose.yml  # Compose com volumes, rede e limites de recursos
+│   ├── docker-compose.yml  # Compose com serviços, volumes, rede e limites de recursos
+│   └── .env.example        # Variáveis de ambiente (copie para .env)
 └── workspace/              # Seus arquivos de trabalho (montado no container)
 ```
 
 ## Personalização
 
-- **Adicionar pacotes**: edite o bloco `RUN apt-get install` no `.devcontainer/Dockerfile`.
+- **Adicionar pacotes do sistema**: edite o bloco `RUN apt-get install` no `.devcontainer/Dockerfile`.
 - **Adicionar extensões VS Code**: inclua os IDs das extensões no array `extensions` do `.devcontainer/devcontainer.json`.
 - **Expor mais portas**: adicione entradas em `forwardPorts` e `portsAttributes` no `devcontainer.json`.
-- **Alterar limites de recursos**: edite o bloco `deploy.resources` no `docker-compose.yml`.
+- **Alterar limites de recursos**: ajuste as variáveis `DEVCONTAINER_*` no `.devcontainer/.env`.
+- **Trocar versão do Node.js**: defina `NODE_MAJOR` no `.env` antes de reconstruir a imagem.
 
 ## Licença
 

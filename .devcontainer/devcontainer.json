@@ -31,8 +31,7 @@
         "mikestead.dotenv",
         // Productivity
         "streetsidesoftware.code-spell-checker",
-        "christian-kohler.path-intellisense",
-        "Continue.continue"
+        "christian-kohler.path-intellisense"
       ]
     }
   },
