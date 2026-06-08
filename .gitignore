@@ -1,3 +1,6 @@
 # Ignora todo o conteúdo de workspace/, mas mantém a pasta no repositório
 workspace/*
 !workspace/.gitkeep
+# Ignora todo o conteúdo de .envs-ps1/, mas mantém a pasta no repositório
+.envs-ps1/*
+!.envs-ps1/.gitkeep
