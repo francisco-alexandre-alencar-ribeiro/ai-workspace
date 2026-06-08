@@ -41,13 +41,11 @@
     3000,  // generic web app
     8000,  // Python / FastAPI
     8080,  // alternative HTTP
-    11434  // Ollama (local LLM)
   ],
 
   "portsAttributes": {
     "3000": { "label": "Web App" },
     "8000": { "label": "Python API" },
     "8080": { "label": "HTTP Alt" },
-    "11434": { "label": "Ollama" }
   }
 }
