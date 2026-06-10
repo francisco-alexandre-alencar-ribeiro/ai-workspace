@@ -191,7 +191,7 @@ models:
   - name: qwen2.5-coder:7b
     provider: ollama
     model: qwen2.5-coder:7b
-    apiBase: http://ollama:11434
+    apiBase: http://localhost:11434
 ```
 
 **Para usar:**
