@@ -6,46 +6,46 @@ Um Dev Container para VS Code pronto para uso em desenvolvimento de IA e softwar
 
 O `docker-compose.yml` sobe **um container**:
 
-| Serviço | Imagem | Descrição |
-|---|---|---|
+| Serviço          | Imagem      | Descrição                                             |
+| ---------------- | ----------- | ----------------------------------------------------- |
 | **devcontainer** | build local | Ambiente de desenvolvimento (VS Code se conecta aqui) |
 
 O devcontainer ingressa na rede externa `shared-network`, onde serviços como **Ollama** e **Open WebUI** são esperados. Esses serviços devem ser iniciados separadamente (por exemplo, em outro compose stack) e ficam acessíveis pelo hostname `ollama` na mesma rede Docker.
 
 ## O que está incluído no devcontainer
 
-| Camada | Detalhes |
-|---|---|
-| **Imagem base** | `mcr.microsoft.com/devcontainers/base:ubuntu-24.04` |
-| **Python** | Python 3.12 (`python3`, `python3-dev`, `python3-pip`, `python3-venv`) + [`uv`](https://github.com/astral-sh/uv) + symlink `python` → `python3` |
-| **Node.js** | Node 20 LTS (via NodeSource) + npm atualizado |
-| **.NET** | .NET 10 SDK (via repositório oficial da Microsoft) |
-| **Claude Code** | `@anthropic-ai/claude-code` instalado globalmente via npm |
-| **Ollama CLI** | Binário `ollama` copiado da imagem oficial; aponta para o serviço externo via `OLLAMA_HOST` |
-| **Ferramentas de build** | `build-essential`, `make`, `git`, `git-lfs`, `jq`, `curl`, `wget`, `unzip` |
-| **Usuário** | `vscode` (não-root, sem privilégios de sudo) |
+| Camada                   | Detalhes                                                                                                                                       |
+| ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Imagem base**          | `mcr.microsoft.com/devcontainers/base:ubuntu-24.04`                                                                                            |
+| **Python**               | Python 3.12 (`python3`, `python3-dev`, `python3-pip`, `python3-venv`) + [`uv`](https://github.com/astral-sh/uv) + symlink `python` → `python3` |
+| **Node.js**              | Node 20 LTS (via NodeSource) + npm atualizado                                                                                                  |
+| **.NET**                 | .NET 10 SDK (via repositório oficial da Microsoft)                                                                                             |
+| **Claude Code**          | `@anthropic-ai/claude-code` instalado globalmente via npm                                                                                      |
+| **Ollama CLI**           | Binário `ollama` copiado da imagem oficial; aponta para o serviço externo via `OLLAMA_HOST`                                                    |
+| **Ferramentas de build** | `build-essential`, `make`, `git`, `git-lfs`, `jq`, `curl`, `wget`, `unzip`                                                                     |
+| **Usuário**              | `vscode` (não-root, sem privilégios de sudo)                                                                                                   |
 
 ### Extensões VS Code
 
-| Categoria | Extensões |
-|---|---|
-| **AI / IDE** | **Continue** (AI coding assistant), **Claude Code** (CLI integrado) |
-| Python | Python, Black formatter, Pylint, Pylance |
-| JS / TS | ESLint, Prettier |
-| Git | GitLens, Git Graph |
-| Containers | Docker, DotEnv |
-| Produtividade | Code Spell Checker, Path Intellisense |
+| Categoria     | Extensões                                                           |
+| ------------- | ------------------------------------------------------------------- |
+| **AI / IDE**  | **Continue** (AI coding assistant), **Claude Code** (CLI integrado) |
+| Python        | Python, Black formatter, Pylint, Pylance                            |
+| JS / TS       | ESLint, Prettier                                                    |
+| Git           | GitLens, Git Graph                                                  |
+| Containers    | Docker, DotEnv                                                      |
+| Produtividade | Code Spell Checker, Path Intellisense                               |
 
 > **Continue**: IDE assistant que trabalha com modelos locais (Ollama) ou cloud. Oferece autocomplete, chat, e refatoração com IA.  
 > **Claude Code**: CLI da Anthropic para usar Claude diretamente no terminal.
 
 ### Portas encaminhadas
 
-| Porta | Label | Uso típico |
-|---|---|---|
-| `3000` | Web App | Open WebUI ou outra aplicação web |
-| `8000` | Python API | Python / FastAPI |
-| `8080` | HTTP Alt | HTTP alternativo |
+| Porta  | Label      | Uso típico                        |
+| ------ | ---------- | --------------------------------- |
+| `3000` | Web App    | Open WebUI ou outra aplicação web |
+| `8000` | Python API | Python / FastAPI                  |
+| `8080` | HTTP Alt   | HTTP alternativo                  |
 
 > A porta `11434` (Ollama API) não é encaminhada pelo devcontainer porque o Ollama roda em container separado; acesse-o pelo hostname `ollama` dentro da rede Docker.
 
@@ -92,7 +92,9 @@ O devcontainer ingressa na rede externa `shared-network`, onde serviços como **
 ## Usando AI no desenvolvimento
 
 ### Continue (IDE AI Assistant)
+
 Continue é um IDE assistant que se integra ao VS Code e oferece:
+
 - **Autocomplete inteligente** com sugestões em tempo real
 - **Chat com IA** dentro do editor (`Ctrl+Shift+I`)
 - **Refatoração e geração de código** assistida
@@ -101,6 +103,7 @@ Continue é um IDE assistant que se integra ao VS Code e oferece:
 Para começar, abra o Command Palette (`Ctrl+Shift+P`) e procure por "Continue".
 
 ### Claude Code (CLI)
+
 Claude Code é a CLI oficial da Anthropic:
 
 ```bash
@@ -127,12 +130,12 @@ O suporte a GPU é configurado no compose stack do serviço **Ollama** (externo 
 
 Os limites do devcontainer são configuráveis via variáveis de ambiente no `.env` (valores padrão entre parênteses):
 
-| Variável | Padrão | Descrição |
-|---|---|---|
-| `DEVCONTAINER_MEMORY_LIMIT` | `8g` | Limite de memória |
+| Variável                      | Padrão | Descrição          |
+| ----------------------------- | ------ | ------------------ |
+| `DEVCONTAINER_MEMORY_LIMIT`   | `8g`   | Limite de memória  |
 | `DEVCONTAINER_MEMORY_RESERVE` | `512m` | Reserva de memória |
-| `DEVCONTAINER_CPU_LIMIT` | `4` | Limite de CPUs |
-| `DEVCONTAINER_CPU_RESERVE` | `0.5` | Reserva de CPUs |
+| `DEVCONTAINER_CPU_LIMIT`      | `4`    | Limite de CPUs     |
+| `DEVCONTAINER_CPU_RESERVE`    | `0.5`  | Reserva de CPUs    |
 
 ## Hardening de segurança
 
@@ -142,8 +145,8 @@ Os limites do devcontainer são configuráveis via variáveis de ambiente no `.e
 
 ## Volumes persistentes
 
-| Volume | Conteúdo |
-|---|---|
+| Volume   | Conteúdo                                                     |
+| -------- | ------------------------------------------------------------ |
 | `vscode` | Home do usuário `vscode` (histórico de shell, cache do `uv`) |
 
 > Volumes dos serviços externos (modelos do Ollama, dados do Open WebUI) são gerenciados pelos seus respectivos compose stacks.
@@ -172,37 +175,47 @@ Os limites do devcontainer são configuráveis via variáveis de ambiente no `.e
 
 ## Conectar Continue com Ollama
 
-Dentro do container, crie ou edite `~/.continue/config.json`:
+Crie a estrutura de diretórios e configuração:
 
-```json
-{
-  "models": [
-    {
-      "title": "Ollama Local",
-      "provider": "ollama",
-      "model": "mistral",
-      "apiBase": "http://ollama:11434"
-    }
-  ],
-  "tabAutocompleteModel": {
-    "title": "Ollama Autocomplete",
-    "provider": "ollama",
-    "model": "mistral",
-    "apiBase": "http://ollama:11434"
-  }
-}
+```bash
+mkdir -p workspace/meu-projeto/.continue/agents
 ```
 
-Substitua `mistral` pelo modelo que você tem instalado no Ollama (ex: `llama2`, `neural-chat`, etc.).
+Crie ou edite `workspace/meu-projeto/.continue/agents/custom-config.yaml` no seu projeto:
+
+```yaml
+name: Custom Config
+version: 1.0.0
+schema: v1
+
+models:
+  - name: qwen2.5-coder:7b
+    provider: ollama
+    model: qwen2.5-coder:7b
+    apiBase: http://ollama:11434
+```
+
+**Para usar:**
+
+1. Substitua `qwen2.5-coder:7b` pelo modelo que você tem instalado no Ollama
+2. Substitua o 'Local Config' por 'custom-config' no chat do Continue, clique em 'Reload' e pronto
+3. A porta `11434` é a padrão do Ollama dentro da rede Docker (`shared-network`)
+
+**Modelos populares:**
+
+- `qwen2.5-coder:7b` — especializado em código
+- `mistral:7b` — versátil e rápido
+- `codegemma:7b` — alternativa Google para código
+- `llama2:7b` — modelo geral
 
 ## Troubleshooting
 
-| Problema | Solução |
-|---|---|
-| Container não inicia | Verifique se Docker está rodando: `docker ps` |
-| Continue não conecta ao Ollama | Verifique se Ollama está rodando: `docker ps \| grep ollama` e se `shared-network` existe: `docker network ls` |
-| `python` não encontrado | O symlink `python → python3` é criado durante a build. Reconstrua a imagem: `Ctrl+Shift+P → Dev Containers: Rebuild Container` |
-| Permissões de escrita em `/workspace` | O volume é montado com a opção `:z` para SELinux. Se ainda tiver problemas, verifique o usuário: `whoami` (deve ser `vscode`) |
+| Problema                              | Solução                                                                                                                        |
+| ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| Container não inicia                  | Verifique se Docker está rodando: `docker ps`                                                                                  |
+| Continue não conecta ao Ollama        | Verifique se Ollama está rodando: `docker ps \| grep ollama` e se `shared-network` existe: `docker network ls`                 |
+| `python` não encontrado               | O symlink `python → python3` é criado durante a build. Reconstrua a imagem: `Ctrl+Shift+P → Dev Containers: Rebuild Container` |
+| Permissões de escrita em `/workspace` | O volume é montado com a opção `:z` para SELinux. Se ainda tiver problemas, verifique o usuário: `whoami` (deve ser `vscode`)  |
 
 ## Recursos úteis
 
