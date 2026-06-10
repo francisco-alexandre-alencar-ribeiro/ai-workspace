@@ -168,7 +168,6 @@ Os limites do devcontainer são configuráveis via variáveis de ambiente no `.e
 
 - **Adicionar pacotes do sistema**: edite o bloco `RUN apt-get install` no `.devcontainer/Dockerfile`.
 - **Adicionar extensões VS Code**: inclua os IDs das extensões no array `extensions` do `.devcontainer/devcontainer.json`.
-- **Configurar Continue**: abra `~/.continue/config.json` dentro do container para customizar modelos, provedores e comportamentos.
 - **Expor mais portas**: adicione entradas em `forwardPorts` e `portsAttributes` no `devcontainer.json`.
 - **Alterar limites de recursos**: ajuste as variáveis `DEVCONTAINER_*` no `.devcontainer/.env`.
 - **Trocar versão do Node.js**: defina `NODE_MAJOR` no `.env` antes de reconstruir a imagem.
