@@ -109,8 +109,9 @@ Para começar, abra o Command Palette (`Ctrl+Shift+P`) e procure por "Continue".
 Claude Code é a CLI oficial da Anthropic:
 
 ```bash
-claude-code <arquivo>              # Editar arquivo com Claude
-claude-code --help                 # Ver todas as opções
+claude                             # Iniciar sessão interativa no diretório atual
+claude "explique este projeto"     # Rodar um prompt direto
+claude --help                      # Ver todas as opções
 ```
 
 Dentro do container, use normalmente — o CLI já está instalado globalmente.
@@ -194,14 +195,14 @@ models:
   - name: qwen2.5-coder:7b
     provider: ollama
     model: qwen2.5-coder:7b
-    apiBase: http://localhost:11434
+    apiBase: http://ollama:11434
 ```
 
 **Para usar:**
 
 1. Substitua `qwen2.5-coder:7b` pelo modelo que você tem instalado no Ollama
 2. Substitua o 'Local Config' por 'custom-config' no chat do Continue, clique em 'Reload' e pronto
-3. A porta `11434` é a padrão do Ollama dentro da rede Docker (`shared-network`)
+3. O host é `ollama` (nome do serviço na `shared-network`), não `localhost` — o Continue roda dentro do devcontainer, e a porta `11434` não é encaminhada. É o mesmo endereço da variável `OLLAMA_HOST`
 
 **Modelos populares:**
 
