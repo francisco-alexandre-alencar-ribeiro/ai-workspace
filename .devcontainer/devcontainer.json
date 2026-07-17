@@ -12,7 +12,15 @@
       "settings": {
         "python.defaultInterpreterPath": "/usr/bin/python3",
         "editor.formatOnSave": true,
-        "terminal.integrated.defaultProfile.linux": "bash"
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "java.jdt.ls.java.home": "/opt/java/current",
+        "java.configuration.runtimes": [
+          {
+            "name": "JavaSE-17",
+            "path": "/opt/java/current",
+            "default": true
+          }
+        ]
       },
       "extensions": [
         // Python
@@ -20,6 +28,8 @@
         "ms-python.black-formatter",
         "ms-python.pylint",
         "ms-python.vscode-pylance",
+        // Java
+        "vscjava.vscode-java-pack",
         // JavaScript / TypeScript
         "dbaeumer.vscode-eslint",
         "esbenp.prettier-vscode",

@@ -1,6 +1,6 @@
 # AI Workspace — Dev Container
 
-Um Dev Container para VS Code pronto para uso em desenvolvimento de IA e software em geral. Oferece um ambiente consistente e reproduzível com Python, Node.js, .NET e um conjunto de ferramentas — incluindo Claude Code, Continue IDE (AI assistant), e o CLI do Ollama — rodando em Docker com hardening de segurança.
+Um Dev Container para VS Code pronto para uso em desenvolvimento de IA e software em geral. Oferece um ambiente consistente e reproduzível com Python, Node.js, .NET, Java e um conjunto de ferramentas — incluindo Claude Code, Continue IDE (AI assistant), e o CLI do Ollama — rodando em Docker com hardening de segurança.
 
 ## Arquitetura
 
@@ -18,8 +18,9 @@ O devcontainer ingressa na rede externa `shared-network`, onde serviços como **
 | ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Imagem base**          | `mcr.microsoft.com/devcontainers/base:ubuntu-24.04`                                                                                            |
 | **Python**               | Python 3.12 (`python3`, `python3-dev`, `python3-pip`, `python3-venv`) + [`uv`](https://github.com/astral-sh/uv) + symlink `python` → `python3` |
-| **Node.js**              | Node 20 LTS (via NodeSource) + npm atualizado                                                                                                  |
+| **Node.js**              | Node 22 LTS (via NodeSource)                                                                                                                   |
 | **.NET**                 | .NET 10 SDK (via repositório oficial da Microsoft)                                                                                             |
+| **Java**                 | Eclipse Temurin JDK 17 em `/opt/java/current` (`JAVA_HOME` já configurado e no `PATH`), com download verificado por SHA-256                    |
 | **Claude Code**          | `@anthropic-ai/claude-code` instalado globalmente via npm                                                                                      |
 | **Ollama CLI**           | Binário `ollama` copiado da imagem oficial; aponta para o serviço externo via `OLLAMA_HOST`                                                    |
 | **Ferramentas de build** | `build-essential`, `make`, `git`, `git-lfs`, `jq`, `curl`, `wget`, `unzip`                                                                     |
@@ -31,6 +32,7 @@ O devcontainer ingressa na rede externa `shared-network`, onde serviços como **
 | ------------- | ------------------------------------------------------------------- |
 | **AI / IDE**  | **Continue** (AI coding assistant), **Claude Code** (CLI integrado) |
 | Python        | Python, Black formatter, Pylint, Pylance                            |
+| Java          | Extension Pack for Java (`vscjava.vscode-java-pack`)                |
 | JS / TS       | ESLint, Prettier                                                    |
 | Git           | GitLens, Git Graph                                                  |
 | Containers    | Docker, DotEnv                                                      |
@@ -171,6 +173,7 @@ Os limites do devcontainer são configuráveis via variáveis de ambiente no `.e
 - **Expor mais portas**: adicione entradas em `forwardPorts` e `portsAttributes` no `devcontainer.json`.
 - **Alterar limites de recursos**: ajuste as variáveis `DEVCONTAINER_*` no `.devcontainer/.env`.
 - **Trocar versão do Node.js**: defina `NODE_MAJOR` no `.env` antes de reconstruir a imagem.
+- **Trocar versão do Java**: ajuste os build args `JAVA_VERSION`, `JAVA_SHA256_X64` e `JAVA_SHA256_AARCH64` no `.devcontainer/Dockerfile`. Os checksums precisam corresponder aos publicados na [release do Temurin 17](https://github.com/adoptium/temurin17-binaries/releases) — a build falha se não baterem.
 
 ## Conectar Continue com Ollama
 
