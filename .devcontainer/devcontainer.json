@@ -51,12 +51,14 @@
   // Ports to forward from the container to your local machine
   "forwardPorts": [
     3000,  // generic web app
+    5173,  // Vite dev server
     8000,  // Python / FastAPI
     8080,  // alternative HTTP
   ],
 
   "portsAttributes": {
     "3000": { "label": "Web App" },
+    "5173": { "label": "Vite Dev Server" },
     "8000": { "label": "Python API" },
     "8080": { "label": "HTTP Alt" },
   }
