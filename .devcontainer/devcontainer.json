@@ -16,7 +16,7 @@
         "java.jdt.ls.java.home": "/opt/java/current",
         "java.configuration.runtimes": [
           {
-            "name": "JavaSE-17",
+            "name": "JavaSE-21",
             "path": "/opt/java/current",
             "default": true
           }

@@ -20,7 +20,7 @@ O devcontainer ingressa na rede externa `shared-network`, onde serviços como **
 | **Python**               | Python 3.12 (`python3`, `python3-dev`, `python3-pip`, `python3-venv`) + [`uv`](https://github.com/astral-sh/uv) + symlink `python` → `python3` |
 | **Node.js**              | Node 22 LTS (via NodeSource)                                                                                                                   |
 | **.NET**                 | .NET 10 SDK (via repositório oficial da Microsoft)                                                                                             |
-| **Java**                 | Eclipse Temurin JDK 17 em `/opt/java/current` (`JAVA_HOME` já configurado e no `PATH`), com download verificado por SHA-256                    |
+| **Java**                 | Eclipse Temurin JDK 21 em `/opt/java/current` (`JAVA_HOME` já configurado e no `PATH`), com download verificado por SHA-256                    |
 | **Claude Code**          | `@anthropic-ai/claude-code` instalado globalmente via npm                                                                                      |
 | **Ollama CLI**           | Binário `ollama` copiado da imagem oficial; aponta para o serviço externo via `OLLAMA_HOST`                                                    |
 | **Ferramentas de build** | `build-essential`, `make`, `git`, `git-lfs`, `jq`, `curl`, `wget`, `unzip`                                                                     |
@@ -174,7 +174,7 @@ Os limites do devcontainer são configuráveis via variáveis de ambiente no `.e
 - **Expor mais portas**: adicione entradas em `forwardPorts` e `portsAttributes` no `devcontainer.json`.
 - **Alterar limites de recursos**: ajuste as variáveis `DEVCONTAINER_*` no `.devcontainer/.env`.
 - **Trocar versão do Node.js**: defina `NODE_MAJOR` no `.env` antes de reconstruir a imagem.
-- **Trocar versão do Java**: ajuste os build args `JAVA_VERSION`, `JAVA_SHA256_X64` e `JAVA_SHA256_AARCH64` no `.devcontainer/Dockerfile`. Os checksums precisam corresponder aos publicados na [release do Temurin 17](https://github.com/adoptium/temurin17-binaries/releases) — a build falha se não baterem.
+- **Trocar versão do Java**: ajuste os build args `JAVA_VERSION`, `JAVA_SHA256_X64` e `JAVA_SHA256_AARCH64` no `.devcontainer/Dockerfile`. Os checksums precisam corresponder aos publicados na [release do Temurin 21](https://github.com/adoptium/temurin21-binaries/releases) — a build falha se não baterem.
 
 ## Conectar Continue com Ollama
 

@@ -1,9 +1,9 @@
 FROM mcr.microsoft.com/devcontainers/base:ubuntu-24.04
 
 ARG NODE_MAJOR=22
-ARG JAVA_VERSION=17.0.18+8
-ARG JAVA_SHA256_X64=0c94cbb54325c40dcf026143eb621562017db5525727f2d9131a11250f72c450
-ARG JAVA_SHA256_AARCH64=592a6702b3a07a0e0b82cb38aaab149bfce1b0c24d6b57ddb410bd9009333095
+ARG JAVA_VERSION=21.0.12.1+1
+ARG JAVA_SHA256_X64=ce79869e1307ed8ee1e2baa86a412b1eb5b75d10a01006d788a6f968bcfaee94
+ARG JAVA_SHA256_AARCH64=23e37e026f12f3e706f18938ff611db3032d075b09d0879a25d06718c773e223
 
 # --------------------------------------------------------------------
 # Base system
@@ -61,7 +61,7 @@ RUN curl -LsSf https://astral.sh/uv/install.sh | \
     UV_INSTALL_DIR=/usr/local/bin sh
 
 # --------------------------------------------------------------------
-# Eclipse Temurin JDK 17
+# Eclipse Temurin JDK 21
 # --------------------------------------------------------------------
 RUN set -eux; \
     case "$(dpkg --print-architecture)" in \
@@ -72,7 +72,7 @@ RUN set -eux; \
     JDK_TAG="$(echo "${JAVA_VERSION}" | sed 's/+/%2B/')"; \
     JDK_FILE="$(echo "${JAVA_VERSION}" | tr '+' '_')"; \
     curl -fsSL -o /tmp/jdk.tar.gz \
-      "https://github.com/adoptium/temurin17-binaries/releases/download/jdk-${JDK_TAG}/OpenJDK17U-jdk_${JDK_ARCH}_linux_hotspot_${JDK_FILE}.tar.gz"; \
+      "https://github.com/adoptium/temurin21-binaries/releases/download/jdk-${JDK_TAG}/OpenJDK21U-jdk_${JDK_ARCH}_linux_hotspot_${JDK_FILE}.tar.gz"; \
     echo "${JDK_SHA}  /tmp/jdk.tar.gz" | sha256sum -c -; \
     mkdir -p /opt/java; \
     tar -xzf /tmp/jdk.tar.gz -C /opt/java; \
