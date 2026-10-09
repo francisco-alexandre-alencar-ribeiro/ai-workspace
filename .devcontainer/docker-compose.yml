@@ -5,6 +5,7 @@ services:
       dockerfile: Dockerfile
       args:
         NODE_MAJOR: ${NODE_MAJOR:-22}
+        SPEC_KIT_VERSION: ${SPEC_KIT_VERSION:-v1.1.3}
     image: ai-workspace-devcontainer
     volumes:
       # Project workspace

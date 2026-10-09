@@ -1,6 +1,6 @@
 # AI Workspace — Dev Container
 
-Um Dev Container para VS Code pronto para uso em desenvolvimento de IA e software em geral. Oferece um ambiente consistente e reproduzível com Python, Node.js, .NET, Java e um conjunto de ferramentas — incluindo Claude Code — rodando em Docker com hardening de segurança.
+Um Dev Container para VS Code pronto para uso em desenvolvimento de IA e software em geral. Oferece um ambiente consistente e reproduzível com Python, Node.js, .NET, Java e um conjunto de ferramentas — incluindo Claude Code e Specify CLI (SDD) — rodando em Docker com hardening de segurança.
 
 ## Arquitetura
 
@@ -22,6 +22,7 @@ O devcontainer ingressa na rede externa `shared-network`, onde serviços externo
 | **.NET**                 | .NET 10 SDK (via repositório oficial da Microsoft)                                                                                             |
 | **Java**                 | Eclipse Temurin JDK 21 em `/opt/java/current` (`JAVA_HOME` já configurado e no `PATH`), com download verificado por SHA-256                    |
 | **Claude Code**          | `@anthropic-ai/claude-code` instalado globalmente via npm                                                                                      |
+| **Specify CLI**          | `specify` ([GitHub Spec Kit](https://github.com/github/spec-kit)) instalado globalmente via `uv tool`, para Spec-Driven Development (SDD)         |
 | **Ferramentas de build** | `build-essential`, `make`, `git`, `git-lfs`, `jq`, `curl`, `wget`, `unzip`                                                                     |
 | **Usuário**              | `vscode` (não-root, sem privilégios de sudo)                                                                                                   |
 
@@ -155,6 +156,7 @@ Os limites do devcontainer são configuráveis via variáveis de ambiente no `.e
 - **Expor mais portas**: adicione entradas em `forwardPorts` e `portsAttributes` no `devcontainer.json`.
 - **Alterar limites de recursos**: ajuste as variáveis `DEVCONTAINER_*` no `.devcontainer/.env`.
 - **Trocar versão do Node.js**: defina `NODE_MAJOR` no `.env` antes de reconstruir a imagem.
+- **Trocar versão do Specify CLI**: defina `SPEC_KIT_VERSION` (tag do [spec-kit](https://github.com/github/spec-kit/tags)) no `.env` antes de reconstruir a imagem.
 - **Trocar versão do Java**: ajuste os build args `JAVA_VERSION`, `JAVA_SHA256_X64` e `JAVA_SHA256_AARCH64` no `.devcontainer/Dockerfile`. Os checksums precisam corresponder aos publicados na [release do Temurin 21](https://github.com/adoptium/temurin21-binaries/releases) — a build falha se não baterem.
 
 ## Troubleshooting

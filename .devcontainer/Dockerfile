@@ -1,6 +1,7 @@
 FROM mcr.microsoft.com/devcontainers/base:ubuntu-24.04
 
 ARG NODE_MAJOR=22
+ARG SPEC_KIT_VERSION=v1.1.3
 ARG JAVA_VERSION=21.0.12.1+1
 ARG JAVA_SHA256_X64=ce79869e1307ed8ee1e2baa86a412b1eb5b75d10a01006d788a6f968bcfaee94
 ARG JAVA_SHA256_AARCH64=23e37e026f12f3e706f18938ff611db3032d075b09d0879a25d06718c773e223
@@ -59,6 +60,15 @@ RUN curl -fsSL https://deb.nodesource.com/setup_${NODE_MAJOR}.x | bash - \
 # --------------------------------------------------------------------
 RUN curl -LsSf https://astral.sh/uv/install.sh | \
     UV_INSTALL_DIR=/usr/local/bin sh
+
+# --------------------------------------------------------------------
+# Specify CLI (GitHub Spec Kit — Spec-Driven Development)
+# Instalado globalmente: o volume `vscode` sobrepõe o $HOME do usuário
+# --------------------------------------------------------------------
+RUN UV_TOOL_DIR=/opt/uv-tools UV_TOOL_BIN_DIR=/usr/local/bin \
+    uv tool install specify-cli \
+      --from "git+https://github.com/github/spec-kit.git@${SPEC_KIT_VERSION}" \
+ && chmod -R a+rX /opt/uv-tools
 
 # --------------------------------------------------------------------
 # Eclipse Temurin JDK 21
