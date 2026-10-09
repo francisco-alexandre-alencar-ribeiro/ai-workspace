@@ -1,6 +1,6 @@
 # AI Workspace — Dev Container
 
-Um Dev Container para VS Code pronto para uso em desenvolvimento de IA e software em geral. Oferece um ambiente consistente e reproduzível com Python, Node.js, .NET, Java e um conjunto de ferramentas — incluindo Claude Code, Continue IDE (AI assistant), e o CLI do Ollama — rodando em Docker com hardening de segurança.
+Um Dev Container para VS Code pronto para uso em desenvolvimento de IA e software em geral. Oferece um ambiente consistente e reproduzível com Python, Node.js, .NET, Java e um conjunto de ferramentas — incluindo Claude Code — rodando em Docker com hardening de segurança.
 
 ## Arquitetura
 
@@ -10,7 +10,7 @@ O `docker-compose.yml` sobe **um container**:
 | ---------------- | ----------- | ----------------------------------------------------- |
 | **devcontainer** | build local | Ambiente de desenvolvimento (VS Code se conecta aqui) |
 
-O devcontainer ingressa na rede externa `shared-network`, onde serviços como **Ollama** e **Open WebUI** são esperados. Esses serviços devem ser iniciados separadamente (por exemplo, em outro compose stack) e ficam acessíveis pelo hostname `ollama` na mesma rede Docker.
+O devcontainer ingressa na rede externa `shared-network`, onde serviços externos como o **Open WebUI** são esperados. Esses serviços devem ser iniciados separadamente (por exemplo, em outro compose stack) e ficam acessíveis pelo hostname do serviço na mesma rede Docker.
 
 ## O que está incluído no devcontainer
 
@@ -22,7 +22,6 @@ O devcontainer ingressa na rede externa `shared-network`, onde serviços como **
 | **.NET**                 | .NET 10 SDK (via repositório oficial da Microsoft)                                                                                             |
 | **Java**                 | Eclipse Temurin JDK 21 em `/opt/java/current` (`JAVA_HOME` já configurado e no `PATH`), com download verificado por SHA-256                    |
 | **Claude Code**          | `@anthropic-ai/claude-code` instalado globalmente via npm                                                                                      |
-| **Ollama CLI**           | Binário `ollama` copiado da imagem oficial; aponta para o serviço externo via `OLLAMA_HOST`                                                    |
 | **Ferramentas de build** | `build-essential`, `make`, `git`, `git-lfs`, `jq`, `curl`, `wget`, `unzip`                                                                     |
 | **Usuário**              | `vscode` (não-root, sem privilégios de sudo)                                                                                                   |
 
@@ -30,7 +29,7 @@ O devcontainer ingressa na rede externa `shared-network`, onde serviços como **
 
 | Categoria     | Extensões                                                           |
 | ------------- | ------------------------------------------------------------------- |
-| **AI / IDE**  | **Continue** (AI coding assistant), **Claude Code** (CLI integrado) |
+| **AI / IDE**  | **Claude Code** (CLI integrado)                                     |
 | Python        | Python, Black formatter, Pylint, Pylance                            |
 | Java          | Extension Pack for Java (`vscjava.vscode-java-pack`)                |
 | JS / TS       | ESLint, Prettier                                                    |
@@ -38,7 +37,6 @@ O devcontainer ingressa na rede externa `shared-network`, onde serviços como **
 | Containers    | Docker, DotEnv                                                      |
 | Produtividade | Code Spell Checker, Path Intellisense                               |
 
-> **Continue**: IDE assistant que trabalha com modelos locais (Ollama) ou cloud. Oferece autocomplete, chat, e refatoração com IA.  
 > **Claude Code**: CLI da Anthropic para usar Claude diretamente no terminal.
 
 ### Portas encaminhadas
@@ -48,8 +46,6 @@ O devcontainer ingressa na rede externa `shared-network`, onde serviços como **
 | `3000` | Web App    | Open WebUI ou outra aplicação web |
 | `8000` | Python API | Python / FastAPI                  |
 | `8080` | HTTP Alt   | HTTP alternativo                  |
-
-> A porta `11434` (Ollama API) não é encaminhada pelo devcontainer porque o Ollama roda em container separado; acesse-o pelo hostname `ollama` dentro da rede Docker.
 
 ## Pré-requisitos
 
@@ -79,7 +75,7 @@ O devcontainer ingressa na rede externa `shared-network`, onde serviços como **
    docker network create shared-network
    ```
 
-4. **Inicie os serviços externos na `shared-network`** (Ollama, Open WebUI, etc.)
+4. **Inicie os serviços externos na `shared-network`** (Open WebUI, etc.)
 
    Suba qualquer compose stack que forneça esses serviços na rede `shared-network`. O devcontainer os encontrará automaticamente pelo hostname.
 
@@ -92,17 +88,6 @@ O devcontainer ingressa na rede externa `shared-network`, onde serviços como **
    O VS Code irá construir a imagem e iniciar o container automaticamente. A pasta `workspace/` do host é montada em `/workspace` dentro do container.
 
 ## Usando AI no desenvolvimento
-
-### Continue (IDE AI Assistant)
-
-Continue é um IDE assistant que se integra ao VS Code e oferece:
-
-- **Autocomplete inteligente** com sugestões em tempo real
-- **Chat com IA** dentro do editor (`Ctrl+Shift+I`)
-- **Refatoração e geração de código** assistida
-- **Suporte a modelos locais** (Ollama) ou cloud
-
-Para começar, abra o Command Palette (`Ctrl+Shift+P`) e procure por "Continue".
 
 ### Claude Code (CLI)
 
@@ -124,10 +109,6 @@ O container encaminha o agente SSH do host para que operações como `git push` 
 eval "$(ssh-agent -s)"
 ssh-add ~/.ssh/id_ed25519   # ou a sua chave de preferência
 ```
-
-## Suporte a GPU (NVIDIA)
-
-O suporte a GPU é configurado no compose stack do serviço **Ollama** (externo a este repositório). Para ativá-lo, adicione o bloco `deploy.resources.reservations.devices` no serviço `ollama` desse stack e garanta que o [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html) esteja instalado no host.
 
 ## Limites de recursos
 
@@ -152,7 +133,7 @@ Os limites do devcontainer são configuráveis via variáveis de ambiente no `.e
 | -------- | ------------------------------------------------------------ |
 | `vscode` | Home do usuário `vscode` (histórico de shell, cache do `uv`) |
 
-> Volumes dos serviços externos (modelos do Ollama, dados do Open WebUI) são gerenciados pelos seus respectivos compose stacks.
+> Volumes dos serviços externos (dados do Open WebUI) são gerenciados pelos seus respectivos compose stacks.
 
 ## Estrutura do projeto
 
@@ -176,56 +157,18 @@ Os limites do devcontainer são configuráveis via variáveis de ambiente no `.e
 - **Trocar versão do Node.js**: defina `NODE_MAJOR` no `.env` antes de reconstruir a imagem.
 - **Trocar versão do Java**: ajuste os build args `JAVA_VERSION`, `JAVA_SHA256_X64` e `JAVA_SHA256_AARCH64` no `.devcontainer/Dockerfile`. Os checksums precisam corresponder aos publicados na [release do Temurin 21](https://github.com/adoptium/temurin21-binaries/releases) — a build falha se não baterem.
 
-## Conectar Continue com Ollama
-
-Crie a estrutura de diretórios e configuração:
-
-```bash
-mkdir -p workspace/meu-projeto/.continue/agents
-```
-
-Crie ou edite `workspace/meu-projeto/.continue/agents/custom-config.yaml` no seu projeto:
-
-```yaml
-name: Custom Config
-version: 1.0.0
-schema: v1
-
-models:
-  - name: qwen2.5-coder:7b
-    provider: ollama
-    model: qwen2.5-coder:7b
-    apiBase: http://ollama:11434
-```
-
-**Para usar:**
-
-1. Substitua `qwen2.5-coder:7b` pelo modelo que você tem instalado no Ollama
-2. Substitua o 'Local Config' por 'custom-config' no chat do Continue, clique em 'Reload' e pronto
-3. O host é `ollama` (nome do serviço na `shared-network`), não `localhost` — o Continue roda dentro do devcontainer, e a porta `11434` não é encaminhada. É o mesmo endereço da variável `OLLAMA_HOST`
-
-**Modelos populares:**
-
-- `qwen2.5-coder:7b` — especializado em código
-- `mistral:7b` — versátil e rápido
-- `codegemma:7b` — alternativa Google para código
-- `llama2:7b` — modelo geral
-
 ## Troubleshooting
 
 | Problema                              | Solução                                                                                                                        |
 | ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
 | Container não inicia                  | Verifique se Docker está rodando: `docker ps`                                                                                  |
-| Continue não conecta ao Ollama        | Verifique se Ollama está rodando: `docker ps \| grep ollama` e se `shared-network` existe: `docker network ls`                 |
 | `python` não encontrado               | O symlink `python → python3` é criado durante a build. Reconstrua a imagem: `Ctrl+Shift+P → Dev Containers: Rebuild Container` |
 | Permissões de escrita em `/workspace` | O volume é montado com a opção `:z` para SELinux. Se ainda tiver problemas, verifique o usuário: `whoami` (deve ser `vscode`)  |
 
 ## Recursos úteis
 
 - [VS Code Dev Containers](https://code.visualstudio.com/docs/devcontainers/containers)
-- [Continue.dev Documentation](https://continue.dev/)
 - [Claude API & Anthropic SDK](https://docs.anthropic.com/)
-- [Ollama Documentation](https://github.com/ollama/ollama)
 
 ## Licença
 

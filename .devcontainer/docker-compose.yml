@@ -21,7 +21,6 @@ services:
       - SSH_AUTH_SOCK=/ssh-agent
       - PYTHONDONTWRITEBYTECODE=1
       - PYTHONUNBUFFERED=1
-      - OLLAMA_HOST=${OLLAMA_HOST:-http://ollama:11434}
 
     # Keep the container alive for VS Code to attach
     command: sleep infinity
