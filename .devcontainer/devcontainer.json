@@ -23,6 +23,8 @@
         ]
       },
       "extensions": [
+        // AI
+        "anthropic.claude-code",
         // Python
         "ms-python.python",
         "ms-python.black-formatter",
