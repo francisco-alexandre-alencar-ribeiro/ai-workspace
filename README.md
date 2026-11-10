@@ -24,13 +24,13 @@ O devcontainer ingressa na rede externa `shared-network`, onde serviços externo
 | **Claude Code**          | `@anthropic-ai/claude-code` instalado globalmente via npm                                                                                      |
 | **Specify CLI**          | `specify` ([GitHub Spec Kit](https://github.com/github/spec-kit)) instalado globalmente via `uv tool`, para Spec-Driven Development (SDD)         |
 | **Ferramentas de build** | `build-essential`, `make`, `git`, `git-lfs`, `jq`, `curl`, `wget`, `unzip`                                                                     |
-| **Usuário**              | `vscode` (não-root, sem privilégios de sudo)                                                                                                   |
+| **Usuário**              | `vscode` (não-root; elevação via `sudo` bloqueada pelo `no-new-privileges`)                                                                    |
 
 ### Extensões VS Code
 
 | Categoria     | Extensões                                                           |
 | ------------- | ------------------------------------------------------------------- |
-| **AI / IDE**  | **Claude Code** (CLI integrado)                                     |
+| **AI / IDE**  | Claude Code (`anthropic.claude-code`)                               |
 | Python        | Python, Black formatter, Pylint, Pylance                            |
 | Java          | Extension Pack for Java (`vscjava.vscode-java-pack`)                |
 | JS / TS       | ESLint, Prettier                                                    |
@@ -38,15 +38,16 @@ O devcontainer ingressa na rede externa `shared-network`, onde serviços externo
 | Containers    | Docker, DotEnv                                                      |
 | Produtividade | Code Spell Checker, Path Intellisense                               |
 
-> **Claude Code**: CLI da Anthropic para usar Claude diretamente no terminal.
+> **Claude Code**: disponível como extensão do VS Code e como CLI (`claude`) no terminal; ambas rodam dentro do container e compartilham a configuração em `~/.claude`.
 
 ### Portas encaminhadas
 
-| Porta  | Label      | Uso típico                        |
-| ------ | ---------- | --------------------------------- |
-| `3000` | Web App    | Open WebUI ou outra aplicação web |
-| `8000` | Python API | Python / FastAPI                  |
-| `8080` | HTTP Alt   | HTTP alternativo                  |
+| Porta  | Label           | Uso típico                        |
+| ------ | --------------- | --------------------------------- |
+| `3000` | Web App         | Open WebUI ou outra aplicação web |
+| `5173` | Vite Dev Server | Servidor de desenvolvimento Vite  |
+| `8000` | Python API      | Python / FastAPI                  |
+| `8080` | HTTP Alt        | HTTP alternativo                  |
 
 ## Pré-requisitos
 
